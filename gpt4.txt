@@ -1,0 +1,15 @@
+0) Cities $A$ and $B$ are $45$ miles apart. Alicia lives in $A$ and Beth lives in $B$. Alicia bikes towards $B$ at $18$ miles per hour. Leaving at the same time, Beth bikes toward $A$ at $12$ miles per hour. How many miles from City $A$ will they be when they meet? Choices: $\textbf{(A) }20\qquad\textbf{(B) }24\qquad\textbf{(C) }25\qquad\textbf{(D) }26\qquad\textbf{(E) }27$[0m
+Model Answer: Since Alicia and Beth are biking towards each other, we can add their speeds to get $18+12=30$ miles per hour. Since they are $45$ miles apart, it will take them $\frac{45}{30}=\frac{3}{2}$ hours to meet. In this time, Alicia will have biked $18\cdot\frac{3}{2}=\boxed{\textbf{(E) }27}$ miles.[0m
+Correct answer: E[0m
+1) The weight of $\frac{1}{3}$ of a large pizza together with $3 \frac{1}{2}$ cups of orange slices is the same weight of $\frac{3}{4}$ of a large pizza together with $\frac{1}{2}$ cups of orange slices. A cup of orange slices weigh $\frac{1}{4}$ of a pound. What is the weight, in pounds, of a large pizza? Choices: $\textbf{(A) }1\frac{4}{5}\qquad\textbf{(B) }2\qquad\textbf{(C) }2\frac{2}{5}\qquad\textbf{(D) }3\qquad\textbf{(E) }3\frac{3}{5}$[0m
+Model Answer: Let $p$ be the weight of a large pizza. We have the equation $\frac{1}{3}p + \frac{7}{8} = \frac{3}{4}p + \frac{1}{8}$. Solving for $p$ gives $p = \boxed{\textbf{(C) }2\frac{2}{5}}$.[0m
+Correct answer: A[0m
+2) How many positive perfect squares less than $2023$ are divisible by $5$? Choices: $\textbf{(A) }8\qquad\textbf{(B) }9\qquad\textbf{(C) }10\qquad\textbf{(D) }11\qquad\textbf{(E) }12$[0m
+Model Answer: The perfect squares that are divisible by $5$ are the squares of the multiples of $5$. The largest multiple of $5$ whose square is less than $2023$ is $5\cdot9=45$, so there are $\boxed{\textbf{(D) }11}$ such perfect squares.[0m
+Correct answer: A[0m
+3) A quadrilateral has all integer side lengths, a perimeter of $26$, and one side of length $4$. What is the greatest possible length of one side of this quadrilateral? Choices: $\textbf{(A) }9\qquad\textbf{(B) }10\qquad\textbf{(C) }11\qquad\textbf{(D) }12\qquad\textbf{(E) }13$[0m
+Model Answer: The sum of the lengths of any three sides of a quadrilateral must be greater than the length of the fourth side. Therefore, the greatest possible length of one side of the quadrilateral is $26-4-1-1=\boxed{\textbf{(C) }11}$.[0m
+Correct answer: D[0m
+4) How many digits are in the base-ten representation of $8^5 \cdot 5^{10} \cdot 15^5$? Choices: $\textbf{(A) } 14 \qquad\textbf{(B) }15 \qquad\textbf{(C) }16 \qquad\textbf{(D) }17 \qquad\textbf{(E) } 18$[0m
+Model Answer: We can simplify the expression to $2^{15} \cdot 5^{15} = 10^{15}$. This is a $1$ followed by $15$ zeroes, so there are $\boxed{\textbf{(C) }16}$ digits.[0m
+Correct answer: E[0m
