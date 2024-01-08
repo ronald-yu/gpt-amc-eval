@@ -25,7 +25,7 @@ def load_exam_solver(exam_name:str, questions: List[Dict[str,str]], args) -> Exa
         Loads exam questions into a solver. If an exam solver corresponding to the exam and model hyper-parameters has already been saved, we load that exam so that we don't need to solve the exam again.
         Also load an exam scorer that aggregates scores and statistics over all the exam solvers.
     """
-    exam_solver = ExamSolver(exam_name, questions, model = args.model, temperature = args.temperature)
+    exam_solver = ExamSolver(exam_name, questions, model = args.model, temperature = args.temperature, prompt_type = args.prompt_type)
     file_name = os.path.join(args.save_dir, f"{exam_solver.solver_name}.pkl")
     if os.path.exists(file_name):
             with open(file_name, 'rb') as file:

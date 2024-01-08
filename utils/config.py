@@ -11,6 +11,7 @@ def get_command_line_args():
     # Solver Hyperparameters
     parser.add_argument('--model', type=str, help='Specify which OpenAI model to use', default = 'gpt-4', choices=['gpt-3.5-turbo', 'gpt-4'])
     parser.add_argument('--temperature', type=float, help='Specify temperature of the model', default = '0.7')
+    parser.add_argument('--prompt-type', type=str, help='Specify which prompt to use', default = 'baseline', choices=['baseline', 'cot'])
 
 
     # Solving Configurations

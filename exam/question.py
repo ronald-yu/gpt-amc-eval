@@ -1,8 +1,6 @@
 from termcolor import colored
 import tiktoken
-
-def remove_non_uppercase(input_string):
-    return ''.join(char for char in input_string if char.isupper())
+from utils.misc import remove_non_uppercase
 
 class ExamQuestion:
     """
