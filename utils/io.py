@@ -25,13 +25,14 @@ def load_exam_solver(exam_name:str, questions: List[Dict[str,str]], args) -> Exa
         Loads exam questions into a solver. If an exam solver corresponding to the exam and model hyper-parameters has already been saved, we load that exam so that we don't need to solve the exam again.
         Also load an exam scorer that aggregates scores and statistics over all the exam solvers.
     """
-    exam_solver = ExamSolver(exam_name, questions, model = args.model, temperature = args.temperature, prompt_type = args.prompt_type)
+    exam_solver = ExamSolver(exam_name, questions, model = args.model, temperature = args.temperature )
     file_name = os.path.join(args.save_dir, f"{exam_solver.solver_name}.pkl")
     if os.path.exists(file_name):
             with open(file_name, 'rb') as file:
                     exam_solver = pickle.load(file)
     # override the save_dir with the config
     exam_solver.save_dir = args.save_dir
+
     return exam_solver
 
 def load_exams(args) -> Tuple[List[ExamSolver], ExamScorer]:
@@ -43,5 +44,6 @@ def load_exams(args) -> Tuple[List[ExamSolver], ExamScorer]:
         questions = read_json(os.path.join(args.data_dir, f"{exam_name}.json"))
         exam_solver = load_exam_solver(exam_name, questions, args)
         exam_solvers.append(exam_solver)
-    exam_scorer = ExamScorer( exam_solvers, abstain_score = args.abstain_score, ensemble_size = args.ensemble_size)
+    exam_scorer = ExamScorer( exam_solvers, abstain_score = args.abstain_score, ensemble_size = args.ensemble_size, iteration=args.num_iterations-1, hide_incomplete_runs = args.hide_incomplete_runs)
+    
     return exam_solvers, exam_scorer

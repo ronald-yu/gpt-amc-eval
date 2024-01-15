@@ -1,6 +1,7 @@
 from termcolor import colored
 import tiktoken
 from utils.misc import remove_non_uppercase
+from utils.openai import single_chat_completion, num_tokens
 
 class ExamQuestion:
     """
@@ -10,7 +11,19 @@ class ExamQuestion:
         self.idx = idx
         self.question = question
         self.solution = solution
-        self.answers: List[Tuple[str, str]] = [] # each answer is a tuple of the chat response and the extracted final answer
+        self.answers: List[List[Tuple[str, str]]] = [[]] # A nested loop of answers. The outer list is per-iteration. The inner-list is per-exam run.
+        # each answer is a tuple of the chat response and the extracted final answer
+
+    def add_answer(self, answer:str, iteration:int) -> None:
+        self.answers[iteration].append((answer,""))
+
+    def set_final_answer(self, final_answer:str, iteration:int, answer_idx:int) -> None:
+        answer, _ = self.answers[iteration][answer_idx]
+        self.answers[iteration][answer_idx] = (answer, final_answer)
+        
+
+    def add_iteration(self) -> None:
+        self.answers.append([])
 
     def grade_final_answer(self, final_answer: str) -> str:
         if final_answer == "abstain":
@@ -20,58 +33,56 @@ class ExamQuestion:
         else:
             return "incorrect"
 
-    def manual_review_final_answer(self, answer: str) -> str:
-        print("\n------\n")
-        print(colored("Please review ambiguous answer.", "red"))
-        print(colored(f"{self.idx+1}) {self.question}", "black"))
-        print(colored( f"Answer: {answer}", "yellow"))
-        final_answer = ""
-        while final_answer not in ["A", "B", "C", "D", "E", "abstain"]:
-            final_answer = input("What is the final answer? Choose 'A', 'B', 'C', 'D', 'E', or 'abstain'. Or 'x' to exit.")
-            if final_answer == "x":
-                exit(0)
-        return final_answer
-
-    def extract_final_answer(self, answer: str) -> str:
+    @staticmethod
+    def extract_final_answer( answer: str, abstain_bad_format=False) -> str:
         """
-            Extract final answer from a chat completion. If we are unable to match the proper regular expression, then trigger manual review. GPT-3.5 does a poor job formatting its responses, so virtually all of its responses will need to undergo manual review.
+            Extract final answer from a properly formatted chat completion. If abstain_bad_format, then we return abstain if the answer is poorly formatted.
         """
         index = answer.find("Final Answer:")
-        # if there's no final answer (e.g. due to poor formatting or the model getting stuck in an endless loop), then we submit it for manual review later
+        # if there's no final answer (e.g. due to poor formatting or the model getting stuck in an endless loop), then we first leave the answer blank
         if index == -1:
-            return self.manual_review_final_answer(answer)
-        answer = answer[index + len("Final Answer:"):].strip()
+            if abstain_bad_format:
+                return "abstain"
+            return ""
+        final_answer = answer[index + len("Final Answer:"):].strip()
         if "abstain" in answer: # if the final answer says we abstained, then we return abstain.
             return "abstain"
-        answer = remove_non_uppercase(answer)
-        if len(answer)==1:
-            return answer
+        final_answer = remove_non_uppercase(final_answer)
+        if len(final_answer)==1:
+            return final_answer
         else:
-            return self.manual_review_final_answer(answer)
+            if abstain_bad_format:
+                return "abstain"
+            return ""
 
-    def extract_final_answers(self, regrade=False) -> None:
+    def extract_final_answers(self, iteration: int) -> None:
         """
-            Extract final answers from the answers and trigger a manual review if necessary.
-            If regrade is activated, then we clear all our memory of previous final answers so that we can manually review ambiguous answers again.
+            Extract final answers from properly formatted answers.
         """
+        answer_list = self.answers[iteration]
         extracted_answers = []
-        for (answer, final_answer) in self.answers:
-            if regrade or final_answer == "":
-                final_answer = self.extract_final_answer(answer)
+        for (answer, final_answer) in answer_list:
+            if final_answer == "":
+                final_answer = ExamQuestion.extract_final_answer(answer)
             extracted_answers.append((answer, final_answer))
-        self.answers = extracted_answers
+        self.answers[iteration] = extracted_answers
 
-    def grade_and_print(self) -> None: 
+    def print_answers(self, iteration) -> None: 
         """
             Grade the answers and then colored print the question, solution, and the list of answers and final answers.
         """
-        # make sure we have up-to-date final answers
-        self.extract_final_answers()
+        if len(self.answers) <= iteration:
+            return
 
         # grade and print the answers
         print(colored(f"{self.idx+1}) {self.question}", "black"))
         print(colored(f"Solution: {self.solution}","blue"))
-        for i, (answer, final_answer) in enumerate(self.answers):
+        for i, (answer, final_answer) in enumerate(self.answers[iteration]):
+            for j in range(iteration):
+                print(f"Prev Answer #{j+1}")
+                color = "black" if j%2 == 0 else "blue"
+                print(colored(self.answers[j][i], color))
+
             correct = self.grade_final_answer(final_answer)
             if correct == "abstain":
                 color = "yellow"

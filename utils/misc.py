@@ -14,8 +14,8 @@ def random_mode(array):
     unique_elements, counts = np.unique(array, return_counts=True)
     max_count = np.max(counts)
     modes = unique_elements[counts == max_count]
-    print(modes)
-    if len(modes) >1:
-        return 'L'
+    #print(modes, max_count)
+    #if len(modes)>1:
+    #    return "L"
     return np.random.choice(modes)
 
