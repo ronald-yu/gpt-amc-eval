@@ -1,4 +1,15 @@
 # Rigorous Evaluation of ChatGPT on the AMC 10 and 12 Exams
+Recent large language models such as ChatGPT~\cite{openai2023gpt} and Gemini~\cite{team2023gemini} have shown impressive near human-level results on several human knowledge and reasoning benchmarks such as the SATs and GSM8k~\cite{cobbe2021gsm8k}. 
+However, on more challenging exams, such as the American Math Competition (AMC) exams, they fare significantly worse, answering a majority of questions incorrectly.
+
+However, current evaluation reporting for these small and challenging multiple-choice question datasets is quite flawed. For example, Gemini reports solving $32\%$ of $150$ AMC problems curated from the 2022 and 2023 contests, beating GPT-4's $30\%$. This equates to an improvement of only three questions. In a challenging multiple-choice (with five choices) exam where the model is potentially guessing on the vast majority of the problems, a single reported three-question improvement gives virtually no information about whether Gemini is indeed better than GPT-4 on this benchmark.
+
+
+This repository contains:
+* A collection of 153 questions from the 2022 and 2023 AMC exams in convenient JSON format
+* A codebase to evaluate the ChatGPT models on these exams. It can be easily adapted to accomodate the chat-completion capabilities of other models as well. 
+* Rigorous evaluations of GPT-3.5 on the AMC exams.
+
 
 ## Dataset
 
@@ -16,7 +27,7 @@ We solve the exams once with 0-temperature sampling and run 100 trials with 0.7-
 
 ## Results
 
-Results are shown below. We also include baselines of always randomly guessing and always abstaining and Gemini's reported results of itself and GPT-4 (although, as argued above, single-score reporting isn't particularly reliable). For models with multiple trials, we include mean, standard deviation, and the min/max score across the trials. Results on individual exams and questions can be seen by running the code using our pre-solved checkpoints.
+Results are shown below. We also include baselines of always randomly guessing and always abstaining and Gemini's reported results of itself (32% correvt) and GPT-4 (29% correct) (although, as argued above, single-score reporting isn't particularly reliable). For models with multiple trials, we include mean, standard deviation, and the min/max score across the trials. Results on individual exams and questions can be seen by running the code using our pre-solved checkpoints.
 
 
 
