@@ -1,8 +1,25 @@
 # Rigorous Evaluation of ChatGPT on the AMC Dataset
 
+## Dataset
+
+We take the questions and answers from the Art of Problem Solving website of the 2022 and 2023 AMC 10A, 10B, 12A, and 12B and store them as json files in `data/`. Questions that appeared in both the AMC 10 and AMC 12 exams are only included in the AMC 10 file. In total there are 153 questions.
 
 
-Here are the results using the `gpt-3.5-turbo` API from January 14-15, 2024. We also include Gemini's reported results of itself and GPT-4. For models with multiple trials, we include mean, standard deviation, and the min/max score across the trials.
+## Experimental Details
+
+The AMC exams offer the option to abstain from answering. It rewards 6 points for a correct answer and 1.5 points for an abstained answer, so abstaining has better expected value than complete random guessing. We prompt the model to always make its best guess when possible, but you can also prompt it to abstain more often.
+
+For each question, we ask it to answer the question and write its final answer in the format "Final Answer: A". If the model fails to format the answer correctly (quite often), then we pass the question and response into a chat completion and prompt it to format the answer correctly. If the model is still unable to format the answer correctly at this point, we mark the answer as "abstain."
+
+
+We run rigorous baselines on the AMC exams using OpenAI's `gpt-3.5-turbo` API from January 14-15, 2024. 
+We solve the exams once with 0-temperature sampling and run 100 trials with 0.7-temperature sampling. We also calculate results for majority-vote based ensemble voting (if there is a tie, we randomly choose one of the tied answers). We can group our trials into either one large ensemble or 10 groups of 10 ensembles.
+
+## Results
+
+Results are shown below. We also include baselines of always randomly guessing and always abstaining and Gemini's reported results of itself and GPT-4 (although, as argued above, single-score reporting isn't particularly reliable). For models with multiple trials, we include mean, standard deviation, and the min/max score across the trials. Results on individual exams and questions can be seen by running the code using our pre-solved checkpoints.
+
+
 
 | **Method**             | **# of Trials** | **# Correct**             | **# Abstain**            | **Score**                      |
 |------------------------|-----------------|---------------------------|--------------------------|--------------------------------|
@@ -17,14 +34,17 @@ Here are the results using the `gpt-3.5-turbo` API from January 14-15, 2024. We 
 | Max Score              | N/A             | 153                       | 0                        | 918                            |
 
 
-Note that results may vary based on the prompt. For example, the prompt we use encourages the model to make its best guess if it cannot find the correct answer, but a prompt that tells the model to abstain will naturally abstain more often.
 
 
 ## Codebase
-You can run the code by running `python main.py`. This will by default solve and score the 2023 AMC 10a. You can edit the prompts by modifying `exams/prompts.py`.
+You can run the code by running `python main.py`. This will by default solve and score the 2023 AMC 10a. 
+
 
 ### Saved Solvers
-Once an exam is solved, we save the results in a pkl file in an output directory. By default, when solving an exam, the code first checks the output directory and loads up all previously solved answers.
+Note that, once an exam is solved, we save the results in a pkl file in an output directory. By default, when solving an exam, the code first checks the output directory and loads up all previously solved answers instead of solving the exam again. Since these pkl files are included in the code, running `python main.py` will load up the pkl file and report our reported results of 100 trial runs on the 2023 AMC 10a.
 
-### Iterative Prompting
-The `--num-iterations` command line argument allows you to do iterative prompting, in which the model looks at both the question and the model's previous response and outputs a new response. Empirically, iterative prompting functions similarly to low-temperature sampling as it lowers the diversity of responses (with more iterations resulting in less diversity), but we did not notice any improvements in performance (and it suffers from the same ambiguous evaluation as zero-temperature sampling).
+### Prompting
+Note that results may vary based on the prompt. For example, the prompt we use encourages the model to make its best guess if it cannot find the correct answer, but a prompt that tells the model to abstain will naturally abstain more often.
+You can edit the prompts by modifying `exams/prompts.py`.
+
+The `--num-iterations` command line argument allows you to do iterative prompting, in which the model looks at both the question and the model's previous response and outputs a new response. Empirically, iterative prompting functions similarly to low-temperature sampling as it lowers the diversity of responses (with more iterations resulting in less diversity), but we did not notice any improvements in performance (and it suffers from the same ambiguous evaluation as zero-temperature sampling). Hence, we do not report any rigorous results here.
