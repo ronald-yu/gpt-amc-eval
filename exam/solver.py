@@ -10,7 +10,12 @@ class ExamSolver:
     """
         Loads exam questions and then solves them.
     """
+
     def __init__(self, exam_name: str, questions: List[Dict[str, str]], model: str, temperature: float, save_dir = ""):
+        """
+            See utils/config.py for description of parameters
+        """
+
         self.exam_name = exam_name
         self.temperature = temperature
         self.model = model
@@ -20,28 +25,11 @@ class ExamSolver:
         self.solver_name = f"examsolver_{self.exam_name}_{self.model}_temperature{self.temperature}"
         self.save_dir = save_dir
 
-    def get_prev_answer(self, question:ExamQuestion, iteration: int):
-        sample_id = len(question.answers[iteration])
-
-        if True or self.iteration_type == "baseline":
-            return question.answers[iteration-1][sample_id][0]
-        
-        group_idx = sample_id // 2
-
-        ret = "Here are three separate responses:"
-        for i in range(2):
-            ret+=f"\nResponse {i}: {question.answers[iteration-1][group_idx*3 + i][0]}\n"
-        print(ret)
-        return ret
-        
-
-    def construct_prompt(self, question:ExamQuestion, iteration:int) -> List[Dict[str,str]]:
+    def construct_prompt(self, question:ExamQuestion, iteration:int, answer_idx: int) -> List[Dict[str,str]]:
         question_prompt = prompts["baseline"].format(question=question.question)
         messages =  [{"role":"user", "content":question_prompt}]
         if iteration > 0:
-            sample_id = len(question.answers[iteration]) 
-            prev_answer = question.answers[iteration-1][sample_id][0]
-            prev_answer = self.get_prev_answer(question, iteration)
+            prev_answer = question.answers[iteration-1][answer_idx][0]
             if self.model == "gpt-3.5-turbo" and num_tokens(prev_answer) + num_tokens(question_prompt) + num_tokens (prompts["iterative"]) >= 4050:
                 return messages
             messages.append({"role":"assistant", "content":prev_answer})
@@ -58,11 +46,13 @@ class ExamSolver:
     
     def solve(self, num_iterations:int, num_questions: int, num_answers: int, skip_questions: int) -> None:
         """
-            Solve first ${num_questions} questions in the exam. Sample enough answers to that every question has at least ${num_answers} answers. 
+            For every iteration up to {num_iterations}, solve first ${num_questions} questions in the exam. Sample enough answers so that every question has at least ${num_answers} answers. 
         """
         # solve the questions
         for iteration in range(num_iterations):
             print(f"  Iteration {iteration+1}")
+
+            # construct messages
             messages_list = []
             for idx, question in enumerate(self.questions):
                 if idx < skip_questions:
@@ -71,20 +61,13 @@ class ExamSolver:
                     break
                 if len(question.answers) == iteration:
                     question.add_iteration() 
-                #if iteration == 0:
-                #    while len(question.answers[iteration]) < num_answers:
-                #        answer = """Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-
-#Final Answer: abstain
-#"""
-                #        question.add_answer(answer, iteration)
-                #    continue
-                num_samples = num_answers - len(question.answers[iteration])
-                if num_samples <= 0:
+                if num_answers <= len(question.answers[iteration]):
                     continue
-                messages = self.construct_prompt(question, iteration)
-                for i in range(num_samples):
+                for answer_idx in range(len(questions.answers[iteration]), num_answers:
+                    messages = self.construct_prompt(question, iteration, answer_idx)
                     messages_list.append((idx,messages))
+
+            # call OpenAI Chat Completion
             batch_size = 1 if self.model == "gpt-4" else 125
             for i in range(0, len(messages_list), batch_size):
                 print(f"Completed {i} of {len(messages_list)} API Calls")
@@ -125,7 +108,7 @@ class ExamSolver:
                 break
             question.print_answers(iteration)
 
-    def save(self):
+    def save(self) -> None:
         """
             Saves the exam to a pkl file in self.save_dir
         """

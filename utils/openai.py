@@ -6,19 +6,38 @@ import asyncio
 
 openai_client = openai.OpenAI(api_key = os.environ.get("OPENAI_API_KEY"))
 
-def sync_chat_completion(**kwargs):
-    ret =  openai_client.chat.completions.create(**kwargs)
-    return ret
-
-
 def num_tokens(text: str, model = "gpt-4") -> int:
-    """Return the number of tokens in a string."""
+    """
+        Return the number of tokens in a string.
+    """
     encoding = tiktoken.encoding_for_model(model)
     return len(encoding.encode(text))
 
+def sync_chat_completion(**kwargs):
+    """
+        Synchronous chat completion
+    """
+    return openai_client.chat.completions.create(**kwargs)
+
+def chat_completion(messages_list: List[Dict[str,str]], model: str, temperature: float) -> List[Tuple[Any, str]]:
+    """
+        Perform chat completion on a messages_list. Use asynchronous calls for batch speed-up for GPT-3.5
+    """
+    if model == "gpt-4": # async API calls throw lots of errors for GPT-4
+        assert len(messages_list) == 1
+        return [(messages_list[0][0],sync_chat_completion(messages=messages_list[0][1], model=model, temperature=temperature).choices[0].message.content)]
+    else: 
+        results = asyncio.run(batch_openai_api(messages_list, model, temperature))
+        return [(idx,x['choices'][0]['message']['content']) for (idx, _), x in results]
 
 
-# Set up your OpenAI API key
+def single_chat_completion(prompt, model, temperature):
+    messages = [{"role":"user", "content":prompt}]
+    messages_list = [ (0, messages) ] 
+    return chat_completion(messages_list, model, temperature)[0][1]
+
+
+# asynchronous Open API call code taken from https://blog.finxter.com/how-to-request-openais-api-asynchronously-in-python/
 openai.api_key = os.environ.get("OPENAI_API_KEY")
 
 async def async_openai_request(messages, model, temperature):
@@ -38,23 +57,7 @@ async def async_openai_request(messages, model, temperature):
             return await response.json()
 
 
-async def batch_openai_api(messages_list,model,temperature):
-
+async def batch_openai_api(messages_list, model, temperature):
     # Gather results from all asynchronous tasks
     results = await asyncio.gather(*(async_openai_request(messages, model,temperature) for _,messages in messages_list))
     return zip(messages_list, results)
-
-def chat_completion(messages_list, model, temperature):
-    if model == "gpt-4": # async API calls throw lots of errors for GPT-4
-        assert len(messages_list) == 1
-        return [(messages_list[0][0],sync_chat_completion(messages=messages_list[0][1], model=model, temperature=temperature).choices[0].message.content)]
-    else: 
-        results = asyncio.run(batch_openai_api(messages_list, model, temperature))
-        return [(idx,x['choices'][0]['message']['content']) for (idx, _), x in results]
-
-
-def single_chat_completion(prompt, model, temperature):
-    messages = [{"role":"user", "content":prompt}]
-    messages_list = [ (0, messages) ] 
-    return chat_completion(messages_list, model, temperature)[0][1]
-    

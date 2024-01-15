@@ -1,12 +1,11 @@
 from termcolor import colored
-import tiktoken
 from utils.misc import remove_non_uppercase
-from utils.openai import single_chat_completion, num_tokens
 
 class ExamQuestion:
     """
-        This class stores the question, solution, and a list of answers provided by the solver. It also grades the answers by extracting final answers from the solver's chat completions and comparing them with the solution.
+        This class stores the question, solution, and a list of answers provided by the solver. 
     """
+
     def __init__(self, idx: int, question: str, solution: str):
         self.idx = idx
         self.question = question
@@ -20,7 +19,6 @@ class ExamQuestion:
     def set_final_answer(self, final_answer:str, iteration:int, answer_idx:int) -> None:
         answer, _ = self.answers[iteration][answer_idx]
         self.answers[iteration][answer_idx] = (answer, final_answer)
-        
 
     def add_iteration(self) -> None:
         self.answers.append([])
@@ -34,12 +32,11 @@ class ExamQuestion:
             return "incorrect"
 
     @staticmethod
-    def extract_final_answer( answer: str, abstain_bad_format=False) -> str:
+    def extract_final_answer( answer: str, abstain_bad_format = False) -> str:
         """
             Extract final answer from a properly formatted chat completion. If abstain_bad_format, then we return abstain if the answer is poorly formatted.
         """
         index = answer.find("Final Answer:")
-        # if there's no final answer (e.g. due to poor formatting or the model getting stuck in an endless loop), then we first leave the answer blank
         if index == -1:
             if abstain_bad_format:
                 return "abstain"
@@ -67,7 +64,7 @@ class ExamQuestion:
             extracted_answers.append((answer, final_answer))
         self.answers[iteration] = extracted_answers
 
-    def print_answers(self, iteration) -> None: 
+    def print_answers(self, iteration: int) -> None: 
         """
             Grade the answers and then colored print the question, solution, and the list of answers and final answers.
         """
