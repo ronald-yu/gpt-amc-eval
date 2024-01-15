@@ -2,8 +2,7 @@
 
 ## Dataset
 
-We take the questions and answers from the Art of Problem Solving website of the 2022 and 2023 AMC 10A, 10B, 12A, and 12B and store them as json files in `data/`. Questions that appeared in both the AMC 10 and AMC 12 exams are only included in the AMC 10 file. In total there are 153 questions.
-
+We take the questions and answers from the [Art of Problem Solving website](https://artofproblemsolving.com/wiki/index.php/AMC_12_Problems_and_Solutions) of the 2022 and 2023 AMC 10A, 10B, 12A, and 12B and store them as json files in `data/`. Questions that appeared in both the AMC 10 and AMC 12 exams are only included in the AMC 10 file. In total there are 153 questions. The `data/` directory also includes the High School Math and College Math tests in [MMLU](https://paperswithcode.com/dataset/mmlu), but we don't provide experimental results for those datasets as they don't involve as much reasoning as AMC.
 
 ## Experimental Details
 
