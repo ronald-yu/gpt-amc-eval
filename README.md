@@ -36,11 +36,11 @@ Results are shown below. We also include baselines of always randomly guessing a
 
 
 ## Codebase
-You can run the code by running `python main.py`. This will by default solve and score the 2023 AMC 10a. 
+You can run the code by running `python main.py --file-names all`. This will solve and score all the AMC exams.
 
 
 ### Saved Solvers
-Note that, once an exam is solved, we save the results in a pkl file in an output directory. By default, when solving an exam, the code first checks the output directory and loads up all previously solved answers instead of solving the exam again. Since these pkl files are included in the code, running `python main.py` will load up the pkl file and report our reported results of 100 trial runs on the 2023 AMC 10a.
+Note that, once an exam is solved, we save the results in a pkl file in an output directory. By default, when solving an exam, the code first checks the output directory and loads up all previously solved answers instead of solving the exam again. Since these pkl files are included in the code, running `python main.py` will load up the pkl file and report our reported results of 100 trial runs on the 2023 AMC 10A (or whichever AMC exam you select).
 
 ### Prompting
 Note that results may vary based on the prompt. For example, the prompt we use encourages the model to make its best guess if it cannot find the correct answer, but a prompt that tells the model to abstain will naturally abstain more often.

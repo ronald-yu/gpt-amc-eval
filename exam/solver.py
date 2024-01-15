@@ -63,12 +63,12 @@ class ExamSolver:
                     question.add_iteration() 
                 if num_answers <= len(question.answers[iteration]):
                     continue
-                for answer_idx in range(len(questions.answers[iteration]), num_answers:
+                for answer_idx in range(len(question.answers[iteration]), num_answers):
                     messages = self.construct_prompt(question, iteration, answer_idx)
                     messages_list.append((idx,messages))
 
             # call OpenAI Chat Completion
-            batch_size = 1 if self.model == "gpt-4" else 125
+            batch_size = 1 if self.model == "gpt-4" else 150
             for i in range(0, len(messages_list), batch_size):
                 print(f"Completed {i} of {len(messages_list)} API Calls")
                 answers = chat_completion(model=self.model, messages_list=messages_list[i:i+batch_size], temperature=self.temperature)

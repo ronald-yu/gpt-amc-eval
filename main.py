@@ -3,6 +3,8 @@ from utils.config import get_command_line_args
 
 def main():
     args = get_command_line_args()
+    if args.file_names == ["all"]:
+        args.file_names = ["amc10a_2023", "amc10b_2023", "amc10a_2022", "amc10b_2022", "amc12a_2023", "amc12b_2023", "amc12a_2022", "amc12b_2022"]
     exam_solvers, exam_scorer = load_exams(args)
 
     for exam_solver in exam_solvers:

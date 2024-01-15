@@ -3,6 +3,7 @@ import os # for getting API token from env variable OPENAI_API_KEY
 import tiktoken
 import aiohttp
 import asyncio
+from typing import List, Dict, Tuple, Any
 
 openai_client = openai.OpenAI(api_key = os.environ.get("OPENAI_API_KEY"))
 

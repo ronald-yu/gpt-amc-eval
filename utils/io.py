@@ -12,11 +12,11 @@ def read_json(path: str) -> None:
     with open(path, 'r') as fh:
         ret = []
         for line in fh.readlines():
-                line = line.replace('\\', '\\\\')
-                d = json.loads(line.replace('\\', '\\\\'))
-                for k in d:
-                        d[k] = d[k].replace('\\\\','\\')
-                ret.append(d)
+            line = line.replace('\\', '\\\\')
+            d = json.loads(line.replace('\\', '\\\\'))
+            for k in d:
+                d[k] = d[k].replace('\\\\','\\')
+            ret.append(d)
         return ret
 
 
@@ -28,8 +28,8 @@ def load_exam_solver(exam_name:str, questions: List[Dict[str,str]], args) -> Exa
     exam_solver = ExamSolver(exam_name, questions, model = args.model, temperature = args.temperature )
     file_name = os.path.join(args.save_dir, f"{exam_solver.solver_name}.pkl")
     if os.path.exists(file_name):
-            with open(file_name, 'rb') as file:
-                    exam_solver = pickle.load(file)
+        with open(file_name, 'rb') as file:
+            exam_solver = pickle.load(file)
     # override the save_dir with the config
     exam_solver.save_dir = args.save_dir
 
