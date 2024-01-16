@@ -1,7 +1,7 @@
 import argparse
 
 def get_command_line_args():
-    parser = argparse.ArgumentParser(description="Arguments for Evaluation of ChatGPT on ")
+    parser = argparse.ArgumentParser(description="Arguments for Evaluation of ChatGPT on AMC 10 and 12")
 
     # IO arguments    
     parser.add_argument("--file-names",nargs="+", type=str, help="Specify list of input files. 'all' evaluates the model on all available AMC exams", default = ["amc10a_2023"])
