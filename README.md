@@ -1,20 +1,27 @@
 # Rigorous Evaluation of ChatGPT on the AMC 10 and 12 Exams
 Recent large language models such as GPT-4 and Gemini have shown impressive near human-level results on several human knowledge and reasoning benchmarks such as the SATs and GSM8k. 
-However, on more challenging exams, such as the American Math Competition (AMC) exams, they fare significantly worse, answering a majority of questions incorrectly.
+However, on more challenging exams, such as the [American Math Competition (AMC) exams](https://maa.org/math-competitions), they fare significantly worse, answering a majority of questions incorrectly.
 
-However, current evaluation reporting for these small and challenging multiple-choice question datasets is quite flawed. For example, Gemini reports solving 32% of 150 AMC problems curated from the 2022 and 2023 contests, beating GPT-4's 30\%. This equates to an improvement of only three questions. In a challenging multiple-choice (with five choices) exam where the model is potentially guessing on the vast majority of the problems, a single reported three-question improvement gives virtually no information about whether Gemini is indeed better than GPT-4 on this benchmark.
+However, current evaluation reporting for these small and challenging multiple-choice question datasets is quite flawed. They tend to report the score of a single trial run (presumably on low-temperature sampling). However, because the exam is both small and challenging enough that the model is potentially guessing on a vast majority of the problems, there is a very large variance in a model's performance on this exam across trial runs. Thus, reporting the mean score across many trial runs is imperative to obtaining rigorous and conclusive evaluations on this dataset.
+
+For example, Gemini reports solving 32% of 150 AMC problems curated from the 2022 and 2023 contests, beating GPT-4's 30\%. This equates to an improvement of only three questions. We observed a standard deviation of 4.6 correctly answered questions between trial runs, so a single reported three-question improvement gives virtually no information about whether Gemini is indeed better than GPT-4 on this benchmark.
 
 
-This repository contains:
+This repository aims to lower the amount of friction required to engage in rigorous evaluation of LLMs on challenging mathematical reasoning tasks by providing:
 * A collection of 153 questions from the 2022 and 2023 AMC exams in convenient JSON format
 * A codebase to evaluate the ChatGPT models on these exams. It can be easily adapted to accomodate the chat-completion capabilities of other models as well. 
 * Rigorous evaluations of GPT-3.5 on the AMC exams that re-affirm the inadequacy of current reporting metrics for the AMC exams and the failure of curent LLMs to do quality mathematical reasoning.
 
-In sum, this repository aims to lower the amount of friction required to engage in rigorous evaluation of LLMs on challenging mathematical reasoning tasks.
 
 ## Dataset
 
 We take the questions and answers from the [Art of Problem Solving website](https://artofproblemsolving.com/wiki/index.php/AMC_12_Problems_and_Solutions) of the 2022 and 2023 AMC 10A, 10B, 12A, and 12B and store them as json files in `data/`. Questions that appeared in both the AMC 10 and AMC 12 exams are only included in the AMC 10 file. In total there are 153 questions. The `data/` directory also includes the High School Math and College Math tests in [MMLU](https://paperswithcode.com/dataset/mmlu), but we don't provide experimental results for those datasets as they don't involve as much reasoning and the results are not as high-variance as AMC.
+
+Despite its limited size, the AMC exams are an interesting and useful dataset for evaluation because:
+* The AMC exam series is significantly more challenging than the SATs and MMLU as measured by LLM (and student) performance and thus represents a large gap in the mathematical reasoning in existing LLMs.
+* LLMs do quite poorly even though no specialized knowledge is required and previous exams are in the training data. Chain of Thought prompting is thus already baked into the model, so the model already knows the correct format of step-by-step solutions for responses (as evidenced by the fact that its responses often include as sign-off by the usernames of those who have historically written up solutions on the Art of Problem Solving website). Thus LLMs' poor performance on these exams are a reflection of their poor mathematical reasoning capabilities rather than a lack of knowledge or data.
+* The high variance in the model's responses to these exam questions may make it useful for investigations on reliability
+ 
 
 ## Codebase
 You can run the code by running `python main.py --file-names all`. This will solve and score all the AMC exams.
@@ -24,10 +31,13 @@ You can run the code by running `python main.py --file-names all`. This will sol
 Note that, once an exam is solved, we save the results in a pkl file in an output directory. By default, when solving an exam, the code first checks the output directory and loads up all previously solved answers instead of solving the exam again. Since these pkl files are included in the code, running `python main.py` will load up the pkl file and report our reported results of 100 trial runs on the 2023 AMC 10A (or whichever AMC exam you select).
 
 ### Prompting
-Note that results may vary based on the prompt. For example, the prompt we use encourages the model to make its best guess if it cannot find the correct answer, but a prompt that tells the model to abstain will naturally abstain more often.
+Note that the prompt we use encourages the model to make its best guess if it cannot find the correct answer, but a prompt that tells the model to abstain will naturally abstain more often (this may result in lower final scores though).
 You can edit the prompts by modifying `exams/prompts.py`.
 
-The `--num-iterations` command line argument allows you to do iterative prompting, in which the model looks at both the question and the model's previous response and outputs a new response. Empirically, iterative prompting functions similarly to low-temperature sampling as it lowers the diversity of responses (with more iterations resulting in less diversity), but we did not notice any improvements in performance (and it suffers from the same ambiguous evaluation as zero-temperature sampling). Hence, we do not report any rigorous results here.
+The `--num-iterations` command line argument allows you to also do iterative prompting, in which the model looks at both the question and the model's previous response and outputs a new response.
+
+
+We were unable to prompt engineer out way into better performance or reliability, but better prompts may exist.
 
 ## Rigorous Evaluations
 ### Experimental Details
@@ -42,7 +52,7 @@ We solve the exams once with 0-temperature sampling and run 100 trials with 0.7-
 
 ### Results
 
-Results are shown below. We also include baselines of always randomly guessing and always abstaining and Gemini's reported results of itself (32% correvt) and GPT-4 (29% correct) (although, as argued above, single-score reporting isn't particularly reliable). For models with multiple trials, we include mean, standard deviation, and the min/max score across the trials. Results on individual exams and questions can be seen by running the code using our pre-solved checkpoints.
+Results are shown below. We also include baselines of always randomly guessing and always abstaining and Gemini's reported results of itself (32% correct) and GPT-4 (30% correct) (although, as argued above, single-score reporting isn't particularly reliable). For models with multiple trials, we include mean, standard deviation, and the min/max score across the trials. Results on individual exams and questions can be seen by running the code using our pre-solved checkpoints.
 
 
 
@@ -59,5 +69,16 @@ Results are shown below. We also include baselines of always randomly guessing a
 | Max Score              | N/A             | 153                       | 0                        | 918                            |
 
 
+## Citation
+If you found this repository helpful, please cite the following:
 
+```
+@misc{gptamceval,
+  author       = Ronald Yu,
+  title        = {Rigorous Evaluations of ChatGPT on the AMC 10 and 12 Exams},
+  year         = 2024,
+  howpublished = {\url{https://github.com/ronald-yu/gpt-amc-eval}},
+}
+```
 
+The views in this repository are my personal views and do not reflect those of my employer.
