@@ -2,13 +2,13 @@
 Recent large language models such as GPT-4 and Gemini have shown impressive near human-level results on several human knowledge and reasoning benchmarks such as the SATs and GSM8k. 
 However, on more challenging exams, such as the [American Math Competition (AMC) exams](https://maa.org/math-competitions), they fare significantly worse, answering a majority of questions incorrectly.
 
-However, current evaluation reporting for these small and challenging multiple-choice question datasets is quite flawed. They tend to report the score of a single trial run (presumably on low-temperature sampling). However, because the exam is both small and challenging enough that the model is potentially guessing on a vast majority of the problems, there is a very large variance in a model's performance on this exam across trial runs. Thus, reporting the mean score across many trial runs is imperative to obtaining rigorous and conclusive evaluations on this dataset.
+However, current evaluation reporting for these small and challenging multiple-choice question datasets is quite flawed. They tend to report the score of a single trial run (presumably on low-temperature sampling). However, because the exam is both small and challenging enough that the model is potentially guessing on a vast majority of the problems, there is a very large variance in a model's performance on these exams across trial runs. Thus, reporting the mean score across many trial runs is imperative to obtaining rigorous and conclusive evaluations on this dataset.
 
 For example, Gemini reports solving 32% of 150 AMC problems curated from the 2022 and 2023 contests, beating GPT-4's 30\%. This equates to an improvement of only three questions. We observed a standard deviation of 4.6 correctly answered questions between trial runs, so a single reported three-question improvement gives little information about whether Gemini is indeed better than GPT-4 on this benchmark.
 
 This repository aims to lower the amount of friction required to engage in rigorous evaluation of LLMs on challenging mathematical reasoning tasks by providing:
 * A collection of 153 questions from the 2022 and 2023 AMC exams in convenient JSON format
-* A codebase to evaluate the ChatGPT models on these exams. It can be easily adapted to accomodate the chat-completion capabilities of other models as well. 
+* A codebase to evaluate the ChatGPT models on these exams. It can be adapted to accomodate the chat-completion capabilities of other models as well. 
 * Rigorous evaluations of GPT-3.5 on the AMC exams that re-affirm the inadequacy of current reporting metrics for the AMC exams and the failure of curent LLMs to do quality mathematical reasoning.
 
 
@@ -31,20 +31,17 @@ Note that, once an exam is solved, we save the results in a pkl file in an outpu
 
 ### Prompting
 Note that the prompt we use encourages the model to make its best guess if it cannot find the correct answer, but a prompt that tells the model to abstain will naturally abstain more often (this may result in lower final scores though).
-You can edit the prompts by modifying `exams/prompts.py`.
 
 The `--num-iterations` command line argument allows you to also do iterative prompting, in which the model looks at both the question and the model's previous response and outputs a new response.
 
-
 We were unable to prompt engineer out way into better performance or reliability, but better prompts may exist.
+You can edit the prompts by modifying `exams/prompts.py`.
 
 ## Rigorous Evaluations
 ### Experimental Details
+For each question, we ask the model to answer the question and write its final answer in the format "Final Answer: A". If the model fails to format the answer correctly (quite often), then we pass the question and response into a chat completion and prompt it to format the answer correctly. If the model is still unable to format the answer correctly at this point, we mark the answer as "abstain."
 
-The AMC exams offer the option to abstain from answering. It rewards 6 points for a correct answer and 1.5 points for an abstained answer, so abstaining has better expected value than complete random guessing. We prompt the model to always make its best guess when possible, but you can also prompt it to abstain more often.
-
-For each question, we ask it to answer the question and write its final answer in the format "Final Answer: A". If the model fails to format the answer correctly (quite often), then we pass the question and response into a chat completion and prompt it to format the answer correctly. If the model is still unable to format the answer correctly at this point, we mark the answer as "abstain."
-
+The AMC exams offer the option to abstain from answering. It rewards 6 points for a correct answer and 1.5 points for an abstained answer, so abstaining has better expected value than complete random guessing. We prompt the model to always make its best guess when possible, but you can also prompt it to abstain more often. We follow the same scoring convention as AMC.
 
 We run rigorous baselines on the AMC exams using OpenAI's `gpt-3.5-turbo` API from January 14-15, 2024. We do not present results to GPT-4 due to cost, but feel free to generate them yourself. 
 We solve the exams once with 0-temperature sampling and run 100 trials with 0.7-temperature sampling. We also calculate results for majority-vote based ensemble voting (if there is a tie, we randomly choose one of the tied answers). We can group our trials into either one large ensemble or 10 groups of 10 ensembles.
@@ -67,6 +64,10 @@ Results are shown below. We also include baselines of always randomly guessing a
 | GPT-3.5 (100 ensemble) | 1               | 59.5                      | 4                        | 363                            |
 | Max Score              | N/A             | 153                       | 0                        | 918                            |
 
+We hi-light the following observations:
+* There is extremely high variance in the results of the model. We cannot skirt around this problem with 0-temperature sampling either, as it does not give a good estimate of the model's mean capability. In order to reduce the standard deviation to be around the half-question mark, taking the mean result over 100 samples (thereby reducing the standard deviation by 10) is quite necessary.
+* GPT-3.5 is very bad at this task, on average marginally outperforming a weak student who abstains from answering every question. 
+* Ensemble voting is particularly helpful, even exceeding the single reported GPT-4 run by multiple standard deviations. While it is conveient that ensembling is so helpful, this raises the question of whether the model can be trained to more reliably output the correct knowledge that it appears to have access to so that single-run performance has lower variance than it currently does  and similar performance as ensembling.
 
 ## Citation
 If you found this repository helpful, please cite the following:
@@ -76,6 +77,8 @@ If you found this repository helpful, please cite the following:
   author       = Ronald Yu,
   title        = {Rigorous Evaluations of ChatGPT on the AMC 10 and 12 Exams},
   year         = 2024,
+  publisher = {GitHub},
+  journal = {GitHub repository},
   howpublished = {\url{https://github.com/ronald-yu/gpt-amc-eval}},
 }
 ```
