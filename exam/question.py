@@ -1,5 +1,7 @@
 from termcolor import colored
 from utils.misc import remove_non_uppercase
+from utils.openai import num_tokens
+from typing import Tuple
 
 class ExamQuestion:
     """
@@ -64,7 +66,7 @@ class ExamQuestion:
             extracted_answers.append((answer, final_answer))
         self.answers[iteration] = extracted_answers
 
-    def print_answers(self, iteration: int) -> None: 
+    def print_answers(self, iteration: int) -> Tuple[int,int]: 
         """
             Grade the answers and then colored print the question, solution, and the list of answers and final answers.
         """
@@ -74,7 +76,13 @@ class ExamQuestion:
         # grade and print the answers
         print(colored(f"{self.idx+1}) {self.question}", "black"))
         print(colored(f"Solution: {self.solution}","blue"))
+        tot_tokens = 0
+        num_answers = 0
         for i, (answer, final_answer) in enumerate(self.answers[iteration]):
+
+            tot_tokens += num_tokens(answer)
+            num_answers += 1
+
             for j in range(iteration):
                 print(f"Prev Answer #{j+1}")
                 color = "black" if j%2 == 0 else "blue"
@@ -90,3 +98,4 @@ class ExamQuestion:
             print(colored( f"Model Final Answer #{i+1}: {final_answer}", color))
             print(colored( f"Model Answer #{i+1}: {answer}", color))
             print("\n----\n")
+        return tot_tokens, num_answers

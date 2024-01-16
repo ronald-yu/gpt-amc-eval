@@ -4,8 +4,7 @@ However, on more challenging exams, such as the [American Math Competition (AMC)
 
 However, current evaluation reporting for these small and challenging multiple-choice question datasets is quite flawed. They tend to report the score of a single trial run (presumably on low-temperature sampling). However, because the exam is both small and challenging enough that the model is potentially guessing on a vast majority of the problems, there is a very large variance in a model's performance on this exam across trial runs. Thus, reporting the mean score across many trial runs is imperative to obtaining rigorous and conclusive evaluations on this dataset.
 
-For example, Gemini reports solving 32% of 150 AMC problems curated from the 2022 and 2023 contests, beating GPT-4's 30\%. This equates to an improvement of only three questions. We observed a standard deviation of 4.6 correctly answered questions between trial runs, so a single reported three-question improvement gives virtually no information about whether Gemini is indeed better than GPT-4 on this benchmark.
-
+For example, Gemini reports solving 32% of 150 AMC problems curated from the 2022 and 2023 contests, beating GPT-4's 30\%. This equates to an improvement of only three questions. We observed a standard deviation of 4.6 correctly answered questions between trial runs, so a single reported three-question improvement gives little information about whether Gemini is indeed better than GPT-4 on this benchmark.
 
 This repository aims to lower the amount of friction required to engage in rigorous evaluation of LLMs on challenging mathematical reasoning tasks by providing:
 * A collection of 153 questions from the 2022 and 2023 AMC exams in convenient JSON format
@@ -15,7 +14,7 @@ This repository aims to lower the amount of friction required to engage in rigor
 
 ## Dataset
 
-We take the questions and answers from the [Art of Problem Solving website](https://artofproblemsolving.com/wiki/index.php/AMC_12_Problems_and_Solutions) of the 2022 and 2023 AMC 10A, 10B, 12A, and 12B and store them as json files in `data/`. Questions that appeared in both the AMC 10 and AMC 12 exams are only included in the AMC 10 file. In total there are 153 questions. The `data/` directory also includes the High School Math and College Math tests in [MMLU](https://paperswithcode.com/dataset/mmlu), but we don't provide experimental results for those datasets as they don't involve as much reasoning and the results are not as high-variance as AMC.
+We take the questions and answers from the [Art of Problem Solving website](https://artofproblemsolving.com/wiki/index.php/AMC_12_Problems_and_Solutions) of the 2022 and 2023 AMC 10A, 10B, 12A, and 12B and store them as json files in `data/`. Questions that appeared in both the AMC 10 and AMC 12 exams are only included in the AMC 10 file. In total there are 153 questions. The `data/` directory also includes the High School Math and College Math tests in [MMLU](https://paperswithcode.com/dataset/mmlu), but we don't provide experimental results for those datasets as they don't involve as much reasoning (as evidenced by the fact that they elicit responses that are roughly half the number of tokens as AMC responses) and the results are not as high-variance as AMC.
 
 Despite its limited size, the AMC exams are an interesting and useful dataset for evaluation because:
 * The AMC exam series is significantly more challenging than the SATs and MMLU as measured by LLM (and student) performance and thus represents a large gap in the mathematical reasoning in existing LLMs.

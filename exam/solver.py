@@ -103,10 +103,16 @@ class ExamSolver:
         """
             Print the results
         """
+
+        tot_tokens = 0
+        tot_answers = 0
         for idx, question in enumerate(self.questions):
             if idx == num_questions:
                 break
-            question.print_answers(iteration)
+            num_tokens, num_answers = question.print_answers(iteration)
+            tot_tokens += num_tokens
+            tot_answers += num_answers
+        print("Average tokens per response:", tot_tokens/tot_answers)
 
     def save(self) -> None:
         """
