@@ -8,7 +8,7 @@ For example, Gemini reports solving 32% of 150 AMC problems curated from the 202
 
 This repository aims to lower the amount of friction required to engage in rigorous evaluation of LLMs on challenging mathematical reasoning tasks by providing:
 * A collection of 153 questions from the 2022 and 2023 AMC exams in convenient JSON format
-* A codebase to evaluate the ChatGPT models on these exams. It can be adapted to accomodate the chat-completion capabilities of other models as well. 
+* A codebase to evaluate the ChatGPT models using the OpenAI API on these exams. It can be adapted to accomodate the chat-completion capabilities of other models as well. 
 * Rigorous evaluations of GPT-3.5 on the AMC exams that re-affirm the inadequacy of current reporting metrics for the AMC exams and the failure of curent LLMs to do quality mathematical reasoning.
 
 
@@ -44,7 +44,7 @@ For each question, we ask the model to answer the question and write its final a
 The AMC exams offer the option to abstain from answering. It rewards 6 points for a correct answer and 1.5 points for an abstained answer, so abstaining has better expected value than complete random guessing. We prompt the model to always make its best guess when possible, but you can also prompt it to abstain more often. We follow the same scoring convention as AMC.
 
 We run rigorous baselines on the AMC exams using OpenAI's `gpt-3.5-turbo` API from January 14-15, 2024. We do not present results to GPT-4 due to cost, but feel free to generate them yourself. 
-We solve the exams once with 0-temperature sampling and run 100 trials with 0.7-temperature sampling. We also calculate results for majority-vote based ensemble voting (if there is a tie, we randomly choose one of the tied answers). We can group our trials into either one large ensemble or 10 groups of 10 ensembles.
+We solve the exams once with 0-temperature sampling and run 100 trials with 0.7-temperature sampling. We also calculate results for majority-vote based ensemble voting (if there is a tie, we randomly choose one of the tied answers). We can group our trials into either one large ensemble of 100 or 10 groups of 10 ensembles.
 
 ### Results
 
@@ -65,7 +65,7 @@ Results are shown below. We also include baselines of always randomly guessing a
 | Max Score              | N/A             | 153                       | 0                        | 918                            |
 
 We hi-light the following observations:
-* There is extremely high variance in the results of the model. We cannot skirt around this problem with 0-temperature sampling either, as it does not give a good estimate of the model's mean capability. In order to reduce the standard deviation to be around the half-question mark, taking the mean result over 100 samples (thereby reducing the standard deviation by 10) is quite necessary.
+* There is extremely high variance and range in the results of the model. We cannot skirt around this problem with 0-temperature sampling either, as it does not give a good estimate of the model's mean capability. In order to reduce the standard deviation to be around the half-question mark, taking the mean result over 100 samples (thereby reducing the standard deviation by 10) is quite necessary.
 * GPT-3.5 is very bad at this task, on average marginally outperforming a weak student who abstains from answering every question. 
 * Ensemble voting is particularly helpful, even exceeding the single reported GPT-4 run by multiple standard deviations. While it is conveient that ensembling is so helpful, this raises the question of whether the model can be trained to more reliably output the correct knowledge that it appears to have access to so that single-run performance has lower variance than it currently does  and similar performance as ensembling.
 

@@ -19,7 +19,6 @@ def read_json(path: str) -> None:
             ret.append(d)
         return ret
 
-
 def load_exam_solver(exam_name:str, questions: List[Dict[str,str]], args) -> ExamSolver:
     """
         Loads exam questions into a solver. If an exam solver corresponding to the exam and model hyper-parameters has already been saved, we load that exam so that we don't need to solve the exam again.
@@ -44,6 +43,6 @@ def load_exams(args) -> Tuple[List[ExamSolver], ExamScorer]:
         questions = read_json(os.path.join(args.data_dir, f"{exam_name}.json"))
         exam_solver = load_exam_solver(exam_name, questions, args)
         exam_solvers.append(exam_solver)
-    exam_scorer = ExamScorer( exam_solvers, abstain_score = args.abstain_score, ensemble_size = args.ensemble_size, iteration=args.num_iterations-1, hide_incomplete_runs = args.hide_incomplete_runs)
+    exam_scorer = ExamScorer(exam_solvers, abstain_score = args.abstain_score, ensemble_size = args.ensemble_size, iteration=args.num_iterations-1, hide_incomplete_runs = args.hide_incomplete_runs)
     
     return exam_solvers, exam_scorer
